@@ -1,5 +1,6 @@
 package com.portfolio.contentranking.common.config;
 
+import com.portfolio.contentranking.auth.JwtAuthenticationEntryPoint;
 import com.portfolio.contentranking.auth.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -36,7 +38,11 @@ public class SecurityConfig {
                 // 세션을 만들지 않음 (stateless)
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // 인증 실패 시 403이 아니라 401 + JSON 으로 응답
+                .exceptionHandling(ex ->
+                        ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/error").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/contents/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/rankings/**").permitAll()

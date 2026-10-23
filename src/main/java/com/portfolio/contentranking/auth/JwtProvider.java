@@ -69,4 +69,9 @@ public class JwtProvider {
                 .parseSignedClaims(token)
                 .getPayload();
     }
+
+    /** 토큰 만료까지 남은 시간(초). 응답 바디에 담아 클라이언트가 갱신 시점을 알게 한다. */
+    public long getExpiresInSeconds() {
+        return expirationMillis / 1000;
+    }
 }

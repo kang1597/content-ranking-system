@@ -1,0 +1,65 @@
+### 1. 회원가입
+POST http://localhost:8081/api/auth/signup
+Content-Type: application/json
+
+{
+  "email": "hong@test.com",
+  "password": "password1234",
+  "nickname": "홍길동"
+}
+
+### 2. 회원가입 - 이메일 중복 (409 기대)
+POST http://localhost:8081/api/auth/signup
+Content-Type: application/json
+
+{
+  "email": "hong@test.com",
+  "password": "password1234",
+  "nickname": "다른사람"
+}
+
+### 3. 회원가입 - 검증 실패 (400 기대)
+POST http://localhost:8081/api/auth/signup
+Content-Type: application/json
+
+{
+  "email": "잘못된형식",
+  "password": "123",
+  "nickname": ""
+}
+
+### 4. 로그인 (토큰 발급)
+POST http://localhost:8081/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "hong@test.com",
+  "password": "password1234"
+}
+
+> {% client.global.set("accessToken", response.body.accessToken); %}
+
+### 5. 로그인 - 비밀번호 틀림 (401 기대)
+POST http://localhost:8081/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "hong@test.com",
+  "password": "wrongpassword"
+}
+
+### 6. 로그인 - 없는 이메일 (401, 5번과 동일한 메시지여야 함)
+POST http://localhost:8081/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "nobody@test.com",
+  "password": "password1234"
+}
+
+### 7. 인증 필요 경로 - 토큰 없이 (401 기대)
+GET http://localhost:8081/api/members
+
+### 8. 인증 필요 경로 - 토큰 사용 (404 기대: 보안 통과 후 경로 없음)
+GET http://localhost:8081/api/members
+Authorization: Bearer {{accessToken}}
