@@ -63,3 +63,44 @@ GET http://localhost:8081/api/members
 ### 8. 인증 필요 경로 - 토큰 사용 (404 기대: 보안 통과 후 경로 없음)
 GET http://localhost:8081/api/members
 Authorization: Bearer {{accessToken}}
+
+### 9. 콘텐츠 작성 (인증 필요)
+POST http://localhost:8081/api/contents
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "title": "거실 인테리어 후기5",
+  "body": "원목 테이블을 놓고 조명을 바꿨더니 분위기가 완전히 달라졌습니다.5"
+}
+
+### 10. 콘텐츠 작성 - 토큰 없이 (401 기대)
+POST http://localhost:8081/api/contents
+Content-Type: application/json
+
+{
+  "title": "제목",
+  "body": "본문"
+}
+
+### 11. 콘텐츠 작성 - 검증 실패 (400 기대)
+POST http://localhost:8081/api/contents
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "title": "",
+  "body": ""
+}
+
+### 12. 콘텐츠 목록 (인증 불필요)
+GET http://localhost:8081/api/contents
+
+### 13. 콘텐츠 목록 - 페이징/정렬 지정
+GET http://localhost:8081/api/contents?page=0&size=5&sort=likeCount,desc
+
+### 14. 콘텐츠 상세
+GET http://localhost:8081/api/contents/1
+
+### 15. 콘텐츠 상세 - 없는 ID (404 기대)
+GET http://localhost:8081/api/contents/9999

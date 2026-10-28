@@ -31,6 +31,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .body(ErrorResponse.of("LOGIN_FAILED", e.getMessage()));
     }
 
+    @ExceptionHandler({ContentNotFoundException.class, MemberNotFoundException.class})
+    public ResponseEntity<ErrorResponse> handleNotFound(RuntimeException e) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of("NOT_FOUND", e.getMessage()));
+    }
+
     /**
      * @Valid 검증 실패.
      * 부모가 이미 @ExceptionHandler로 등록해둔 메서드를 재정의해,
