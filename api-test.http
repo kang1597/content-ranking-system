@@ -104,3 +104,33 @@ GET http://localhost:8081/api/contents/1
 
 ### 15. 콘텐츠 상세 - 없는 ID (404 기대)
 GET http://localhost:8081/api/contents/9999
+
+### 16. 좋아요 등록
+POST http://localhost:8081/api/contents/1/likes
+Authorization: Bearer {{accessToken}}
+
+### 17. 좋아요 중복 등록 (409 기대)
+POST http://localhost:8081/api/contents/1/likes
+Authorization: Bearer {{accessToken}}
+
+### 18. 좋아요 수 조회 (인증 불필요)
+GET http://localhost:8081/api/contents/1/likes/count
+
+### 19. 좋아요 수 조회 - 토큰 포함 (liked: true 기대)
+GET http://localhost:8081/api/contents/1/likes/count
+Authorization: Bearer {{accessToken}}
+
+### 20. 좋아요 취소
+DELETE http://localhost:8081/api/contents/1/likes
+Authorization: Bearer {{accessToken}}
+
+### 21. 좋아요 중복 취소 (404 기대)
+DELETE http://localhost:8081/api/contents/1/likes
+Authorization: Bearer {{accessToken}}
+
+### 22. 좋아요 - 토큰 없이 (401 기대)
+POST http://localhost:8081/api/contents/1/likes
+
+### 23. 좋아요 - 없는 콘텐츠 (404 기대)
+POST http://localhost:8081/api/contents/9999/likes
+Authorization: Bearer {{accessToken}}

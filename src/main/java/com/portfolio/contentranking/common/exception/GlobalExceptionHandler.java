@@ -24,6 +24,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .body(ErrorResponse.of("DUPLICATE_EMAIL", e.getMessage()));
     }
 
+    @ExceptionHandler(AlreadyLikedException.class)
+    public ResponseEntity<ErrorResponse> handleAlreadyLiked(AlreadyLikedException e) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of("ALREADY_LIKED", e.getMessage()));
+    }
+
     @ExceptionHandler(LoginFailedException.class)
     public ResponseEntity<ErrorResponse> handleLoginFailed(LoginFailedException e) {
         return ResponseEntity
@@ -31,7 +38,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .body(ErrorResponse.of("LOGIN_FAILED", e.getMessage()));
     }
 
-    @ExceptionHandler({ContentNotFoundException.class, MemberNotFoundException.class})
+    @ExceptionHandler({
+            ContentNotFoundException.class,
+            MemberNotFoundException.class,
+            LikeNotFoundException.class
+    })
     public ResponseEntity<ErrorResponse> handleNotFound(RuntimeException e) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
