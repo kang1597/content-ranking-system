@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -44,6 +45,10 @@ public class Content extends BaseTimeEntity {
 
     @Column(nullable = false)
     private long viewCount;
+
+    /** 낙관적 락용 버전. Hibernate가 자동으로 관리한다. */
+    @Version
+    private Long version;
 
     @Builder
     private Content(Member member, String title, String body) {
