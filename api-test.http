@@ -136,3 +136,155 @@ POST http://localhost:8081/api/contents/{{contentId}}/likes
 ### 23. 좋아요 - 없는 콘텐츠 (404 기대)
 POST http://localhost:8081/api/contents/9999/likes
 Authorization: Bearer {{accessToken}}
+
+### 24. 일간 랭킹
+GET http://localhost:8081/api/rankings/contents?period=DAILY&limit=10
+
+### 25. 전체 랭킹
+GET http://localhost:8081/api/rankings/contents?period=ALL&limit=10
+
+### 26. 랭킹 - 잘못된 기간 (400 기대)
+GET http://localhost:8081/api/rankings/contents?period=YEARLY
+
+###############################################
+# 랭킹 테스트 시나리오 (계정 3개 / 콘텐츠 3개)
+###############################################
+
+### 27. 랭킹용 회원 1 가입
+POST http://localhost:8081/api/auth/signup
+Content-Type: application/json
+
+{
+  "email": "rank1@test.com",
+  "password": "pass1234",
+  "nickname": "랭커1"
+}
+
+### 28. 랭킹용 회원 2 가입
+POST http://localhost:8081/api/auth/signup
+Content-Type: application/json
+
+{
+  "email": "rank2@test.com",
+  "password": "pass1234",
+  "nickname": "랭커2"
+}
+
+### 29. 랭킹용 회원 3 가입
+POST http://localhost:8081/api/auth/signup
+Content-Type: application/json
+
+{
+  "email": "rank3@test.com",
+  "password": "pass1234",
+  "nickname": "랭커3"
+}
+
+### 30. 회원 1 로그인 -> token1
+POST http://localhost:8081/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "rank1@test.com",
+  "password": "pass1234"
+}
+
+> {%
+    client.global.set("token1", response.body.accessToken);
+%}
+
+### 31. 회원 2 로그인 -> token2
+POST http://localhost:8081/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "rank2@test.com",
+  "password": "pass1234"
+}
+
+> {%
+    client.global.set("token2", response.body.accessToken);
+%}
+
+### 32. 회원 3 로그인 -> token3
+POST http://localhost:8081/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "rank3@test.com",
+  "password": "pass1234"
+}
+
+> {%
+    client.global.set("token3", response.body.accessToken);
+%}
+
+### 33. 콘텐츠 A 작성 -> contentA
+POST http://localhost:8081/api/contents
+Content-Type: application/json
+Authorization: Bearer {{token1}}
+
+{
+  "title": "20평대 거실 인테리어 전체 기록",
+  "body": "소파 배치부터 조명까지 3개월간의 기록입니다."
+}
+
+> {%
+    client.global.set("contentA", response.body.contentId);
+%}
+
+### 34. 콘텐츠 B 작성 -> contentB
+POST http://localhost:8081/api/contents
+Content-Type: application/json
+Authorization: Bearer {{token1}}
+
+{
+  "title": "원룸 수납 아이디어 10가지",
+  "body": "좁은 공간을 넓게 쓰는 방법을 정리했습니다."
+}
+
+> {%
+    client.global.set("contentB", response.body.contentId);
+%}
+
+### 35. 콘텐츠 C 작성 -> contentC
+POST http://localhost:8081/api/contents
+Content-Type: application/json
+Authorization: Bearer {{token1}}
+
+{
+  "title": "주방 타일 셀프 시공 후기",
+  "body": "비용과 실패한 부분까지 솔직하게 적었습니다."
+}
+
+> {%
+    client.global.set("contentC", response.body.contentId);
+%}
+
+###############################################
+# 차등 좋아요 : A=3점, B=2점, C=1점
+###############################################
+
+### 36. A <- 회원1
+POST http://localhost:8081/api/contents/{{contentA}}/likes
+Authorization: Bearer {{token1}}
+
+### 37. A <- 회원2
+POST http://localhost:8081/api/contents/{{contentA}}/likes
+Authorization: Bearer {{token2}}
+
+### 38. A <- 회원3
+POST http://localhost:8081/api/contents/{{contentA}}/likes
+Authorization: Bearer {{token3}}
+
+### 39. B <- 회원1
+POST http://localhost:8081/api/contents/{{contentB}}/likes
+Authorization: Bearer {{token1}}
+
+### 40. B <- 회원2
+POST http://localhost:8081/api/contents/{{contentB}}/likes
+Authorization: Bearer {{token2}}
+
+### 41. C <- 회원1
+POST http://localhost:8081/api/contents/{{contentC}}/likes
+Authorization: Bearer {{token1}}

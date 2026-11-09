@@ -9,6 +9,7 @@ import com.portfolio.contentranking.content.ContentRepository;
 import com.portfolio.contentranking.like.dto.LikeResponse;
 import com.portfolio.contentranking.member.Member;
 import com.portfolio.contentranking.member.MemberRepository;
+import com.portfolio.contentranking.ranking.ContentRankingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class LikeService {
     private final ContentRepository contentRepository;
     private final MemberRepository memberRepository;
     private final LikeCountCache likeCountCache;
+    private final ContentRankingRepository contentRankingRepository;
 
     @Transactional
     public LikeResponse like(Long contentId, Long memberId) {
@@ -59,6 +61,7 @@ public class LikeService {
         }
 
         likeCountCache.evictAfterCompletion(contentId);
+        contentRankingRepository.addScore(contentId, 1);
         return new LikeResponse(contentId, currentLikeCount(contentId), true);
     }
 
@@ -73,6 +76,7 @@ public class LikeService {
         }
 
         likeCountCache.evictAfterCompletion(contentId);
+        contentRankingRepository.addScore(contentId, -1);
         return new LikeResponse(contentId, currentLikeCount(contentId), false);
     }
 
