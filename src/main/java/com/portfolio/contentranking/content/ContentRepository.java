@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.repository.query.Param;
+import com.portfolio.contentranking.ranking.RankingScore;
+import java.util.List;
 
 import java.util.Optional;
 
@@ -40,4 +42,9 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("update Content c set c.viewCount = c.viewCount + :delta where c.id = :id")
     int addViewCount(@Param("id") Long id, @Param("delta") long delta);
+
+    @Query("select new com.portfolio.contentranking.ranking.RankingScore(c.id, c.likeCount) "
+            + "from Content c "
+            + "where c.likeCount > 0")
+    List<RankingScore> findAllLikeScores();
 }

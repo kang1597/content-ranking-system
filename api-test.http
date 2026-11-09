@@ -288,3 +288,10 @@ Authorization: Bearer {{token2}}
 ### 41. C <- 회원1
 POST http://localhost:8081/api/contents/{{contentC}}/likes
 Authorization: Bearer {{token1}}
+
+### 42. 랭킹 수동 재구축 (인증 필요)
+POST http://localhost:8081/api/rankings/rebuild
+Authorization: Bearer {{token1}}
+
+### 43. 랭킹 재구축 - 토큰 없이 (401 기대)
+POST http://localhost:8081/api/rankings/rebuild

@@ -4,6 +4,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import com.portfolio.contentranking.ranking.RankingScore;
+import java.time.LocalDateTime;
+import java.util.List;
 
 import java.util.Optional;
 
@@ -21,4 +24,12 @@ public interface ContentLikeRepository extends JpaRepository<ContentLike, Long> 
             + "where cl.content.id = :contentId and cl.member.id = :memberId")
     int deleteByContentIdAndMemberId(@Param("contentId") Long contentId,
                                      @Param("memberId") Long memberId);
+
+    @Query("select new com.portfolio.contentranking.ranking.RankingScore("
+            + "    cl.content.id, count(cl.id)) "
+            + "from ContentLike cl "
+            + "where cl.createdAt >= :start and cl.createdAt < :end "
+            + "group by cl.content.id")
+    List<RankingScore> countLikesBetween(@Param("start") LocalDateTime start,
+                                         @Param("end") LocalDateTime end);
 }

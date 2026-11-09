@@ -5,6 +5,7 @@ import com.portfolio.contentranking.content.ContentRepository;
 import com.portfolio.contentranking.ranking.dto.RankingItem;
 import com.portfolio.contentranking.ranking.dto.RankingResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,17 +14,26 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RankingService {
 
     private final ContentRankingRepository contentRankingRepository;
     private final ContentRepository contentRepository;
+    private final RankingRebuildService rankingRebuildService;
 
     @Transactional(readOnly = true)
     public RankingResponse getRanking(RankingPeriod period, int limit) {
         List<ContentRankingRepository.RankedContent> ranked =
                 contentRankingRepository.findTop(period, limit);
+
+        // 키 자체가 없으면 Redis 유실로 보고 DB에서 재구축한다
+        if (ranked.isEmpty() && contentRankingRepository.needsRebuild(period)) {
+            int rebuilt = rankingRebuildService.rebuild(period);
+            log.info("랭킹 키 부재로 재구축 수행. period={}, 건수={}", period, rebuilt);
+            ranked = contentRankingRepository.findTop(period, limit);
+        }
 
         if (ranked.isEmpty()) {
             return new RankingResponse(period.name().toLowerCase(), List.of());
