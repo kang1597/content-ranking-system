@@ -74,4 +74,15 @@ public class LikeCountCache {
     private String key(Long contentId) {
         return KEY_PREFIX + contentId;
     }
+
+    /** Redis 에서 원자적으로 1 증가시키고 증가 후 값을 돌려준다. */
+    public Optional<Long> increment(Long contentId) {
+        try {
+            Long value = redisTemplate.opsForValue().increment(key(contentId));
+            return Optional.ofNullable(value);
+        } catch (Exception e) {
+            log.warn("좋아요 수 캐시 증가 실패. contentId={}, reason={}", contentId, e.getMessage());
+            return Optional.empty();
+        }
+    }
 }

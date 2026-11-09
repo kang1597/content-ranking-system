@@ -37,6 +37,7 @@ class LikeStrategyComparisonTest {
     @Autowired private ContentRepository contentRepository;
     @Autowired private ContentLikeRepository contentLikeRepository;
     @Autowired private PasswordEncoder passwordEncoder;
+    @Autowired private LikeCountCache likeCountCache;
 
     private Long authorId;
     private List<Long> memberIds;
@@ -49,6 +50,7 @@ class LikeStrategyComparisonTest {
             Map<String, Integer> failReasons,
             long rowCount,
             long likeCount,
+            Long redisCount,
             long elapsedMs
     ) {
     }
@@ -115,6 +117,8 @@ class LikeStrategyComparisonTest {
                 .title("동시성 테스트 콘텐츠")
                 .body("100명이 동시에 좋아요를 누른다")
                 .build()).getId();
+
+        likeCountCache.evict(contentId);     // ← 추가
     }
 
     private MeasureResult measure(LikeStrategy strategy) throws InterruptedException {
@@ -153,6 +157,7 @@ class LikeStrategyComparisonTest {
                 failReasons,
                 contentLikeRepository.countByContentId(contentId),
                 contentRepository.findById(contentId).orElseThrow().getLikeCount(),
+                likeCountCache.find(contentId).orElse(null),    // ← 추가
                 elapsed
         );
     }
@@ -163,7 +168,11 @@ class LikeStrategyComparisonTest {
                 .formatted(REQUEST_COUNT, THREAD_POOL_SIZE));
 
         for (MeasureResult r : results) {
-            long lost = r.rowCount() - r.likeCount();
+            long counted = (r.redisCount() != null && r.likeCount() == 0)
+                    ? r.redisCount()          // Redis 가 집계를 맡은 경우
+                    : r.likeCount();
+
+            long lost = r.rowCount() - counted;
             String integrity = (lost == 0) ? "✅ 정합성 OK" : "❌ 유실 " + lost;
             String throughput = "%d/%d (%.0f%%)".formatted(
                     r.success(), REQUEST_COUNT, r.success() * 100.0 / REQUEST_COUNT);
@@ -174,12 +183,15 @@ class LikeStrategyComparisonTest {
                        처리량             : %s
                        실패 원인          : %s
                        content_like 행 수 : %d
-                       like_count         : %d
+                       like_count (DB)    : %d
+                       Redis 집계         : %s
                        정합성             : %s
                        소요 시간          : %d ms
                     """.formatted(
                     r.strategy(), throughput, r.failReasons(),
-                    r.rowCount(), r.likeCount(), integrity, r.elapsedMs()));
+                    r.rowCount(), r.likeCount(),
+                    r.redisCount() == null ? "-" : r.redisCount().toString(),
+                    integrity, r.elapsedMs()));
         }
 
         sb.append("==========================================================================\n");
