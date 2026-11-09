@@ -14,7 +14,7 @@ public record ContentResponse(
         long viewCount,
         LocalDateTime createdAt
 ) {
-    public static ContentResponse from(Content content) {
+    public static ContentResponse of(Content content, long viewCount) {
         return new ContentResponse(
                 content.getId(),
                 content.getTitle(),
@@ -22,7 +22,7 @@ public record ContentResponse(
                 content.getMember().getId(),
                 content.getMember().getNickname(),
                 content.getLikeCount(),
-                content.getViewCount(),
+                viewCount,
                 content.getCreatedAt()
         );
     }

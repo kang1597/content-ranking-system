@@ -19,6 +19,7 @@ public class ContentService {
 
     private final ContentRepository contentRepository;
     private final MemberRepository memberRepository;
+    private final ViewCountCache viewCountCache;
 
     @Transactional
     public ContentResponse create(Long memberId, ContentCreateRequest request) {
@@ -33,7 +34,7 @@ public class ContentService {
 
         contentRepository.save(content);
 
-        return ContentResponse.from(content);
+        return ContentResponse.of(content, content.getViewCount());
     }
 
     @Transactional(readOnly = true)
@@ -49,6 +50,8 @@ public class ContentService {
         Content content = contentRepository.findById(contentId)
                 .orElseThrow(() -> new ContentNotFoundException(contentId));
 
-        return ContentResponse.from(content);
+        long delta = viewCountCache.increment(contentId);
+
+        return ContentResponse.of(content, content.getViewCount() + delta);
     }
 }

@@ -35,4 +35,9 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
     @Query("update Content c set c.likeCount = c.likeCount - 1 "
             + "where c.id = :id and c.likeCount > 0")
     int decreaseLikeCount(@Param("id") Long id);
+
+    /** 조회수 증분을 DB 에 반영한다. */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update Content c set c.viewCount = c.viewCount + :delta where c.id = :id")
+    int addViewCount(@Param("id") Long id, @Param("delta") long delta);
 }

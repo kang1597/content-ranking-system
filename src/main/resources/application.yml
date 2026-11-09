@@ -31,6 +31,9 @@ jwt:
   secret: Y29udGVudC1yYW5raW5nLXN5c3RlbS1sb2NhbC1kZXYtc2VjcmV0LWtleS0yMDI2
   expiration-millis: 3600000
 
+viewcount:
+  sync-interval-ms: 60000
+
 logging:
   level:
     org.hibernate.SQL: debug
