@@ -28,6 +28,7 @@ public class LikeService {
     private final ContentLikeRepository contentLikeRepository;
     private final ContentRepository contentRepository;
     private final MemberRepository memberRepository;
+    private final LikeCountCache likeCountCache;
 
     @Transactional
     public LikeResponse like(Long contentId, Long memberId) {
@@ -57,6 +58,7 @@ public class LikeService {
             throw new AlreadyLikedException();
         }
 
+        likeCountCache.evictAfterCompletion(contentId);
         return new LikeResponse(contentId, currentLikeCount(contentId), true);
     }
 
@@ -70,18 +72,25 @@ public class LikeService {
             throw new ContentNotFoundException(contentId);
         }
 
+        likeCountCache.evictAfterCompletion(contentId);
         return new LikeResponse(contentId, currentLikeCount(contentId), false);
     }
 
     @Transactional(readOnly = true)
     public LikeResponse getLikeCount(Long contentId, Long memberId) {
-        Content content = contentRepository.findById(contentId)
-                .orElseThrow(() -> new ContentNotFoundException(contentId));
+        long count = likeCountCache.find(contentId)
+                .orElseGet(() -> {
+                    long fromDb = contentRepository.findById(contentId)
+                            .orElseThrow(() -> new ContentNotFoundException(contentId))
+                            .getLikeCount();
+                    likeCountCache.put(contentId, fromDb);
+                    return fromDb;
+                });
 
         boolean liked = memberId != null
                 && contentLikeRepository.existsByContentIdAndMemberId(contentId, memberId);
 
-        return new LikeResponse(contentId, content.getLikeCount(), liked);
+        return new LikeResponse(contentId, count, liked);
     }
 
     private long currentLikeCount(Long contentId) {

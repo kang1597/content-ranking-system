@@ -70,9 +70,11 @@ Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 {
-  "title": "거실 인테리어 후기5",
-  "body": "원목 테이블을 놓고 조명을 바꿨더니 분위기가 완전히 달라졌습니다.5"
+  "title": "거실 인테리어 후기",
+  "body": "원목 테이블을 놓고 조명을 바꿨더니 분위기가 완전히 달라졌습니다."
 }
+
+> {% client.global.set("contentId", response.body.contentId); %}
 
 ### 10. 콘텐츠 작성 - 토큰 없이 (401 기대)
 POST http://localhost:8081/api/contents
@@ -100,36 +102,36 @@ GET http://localhost:8081/api/contents
 GET http://localhost:8081/api/contents?page=0&size=5&sort=likeCount,desc
 
 ### 14. 콘텐츠 상세
-GET http://localhost:8081/api/contents/1
+GET http://localhost:8081/api/contents/{{contentId}}
 
 ### 15. 콘텐츠 상세 - 없는 ID (404 기대)
 GET http://localhost:8081/api/contents/9999
 
 ### 16. 좋아요 등록
-POST http://localhost:8081/api/contents/1/likes
+POST http://localhost:8081/api/contents/{{contentId}}/likes
 Authorization: Bearer {{accessToken}}
 
 ### 17. 좋아요 중복 등록 (409 기대)
-POST http://localhost:8081/api/contents/1/likes
+POST http://localhost:8081/api/contents/{{contentId}}/likes
 Authorization: Bearer {{accessToken}}
 
 ### 18. 좋아요 수 조회 (인증 불필요)
-GET http://localhost:8081/api/contents/1/likes/count
+GET http://localhost:8081/api/contents/{{contentId}}/likes/count
 
 ### 19. 좋아요 수 조회 - 토큰 포함 (liked: true 기대)
-GET http://localhost:8081/api/contents/1/likes/count
+GET http://localhost:8081/api/contents/{{contentId}}/likes/count
 Authorization: Bearer {{accessToken}}
 
 ### 20. 좋아요 취소
-DELETE http://localhost:8081/api/contents/1/likes
+DELETE http://localhost:8081/api/contents/{{contentId}}/likes
 Authorization: Bearer {{accessToken}}
 
 ### 21. 좋아요 중복 취소 (404 기대)
-DELETE http://localhost:8081/api/contents/1/likes
+DELETE http://localhost:8081/api/contents/{{contentId}}/likes
 Authorization: Bearer {{accessToken}}
 
 ### 22. 좋아요 - 토큰 없이 (401 기대)
-POST http://localhost:8081/api/contents/1/likes
+POST http://localhost:8081/api/contents/{{contentId}}/likes
 
 ### 23. 좋아요 - 없는 콘텐츠 (404 기대)
 POST http://localhost:8081/api/contents/9999/likes
