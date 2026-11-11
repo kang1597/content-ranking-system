@@ -1,38 +1,45 @@
 spring:
   application:
     name: content-ranking-system
-
   datasource:
-    url: jdbc:mysql://localhost:3308/rankingdb?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&rewriteBatchedStatements=true
-    username: dev
-    password: dev1234
+    url: ${DB_URL:jdbc:mysql://localhost:3308/rankingdb?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&rewriteBatchedStatements=true}
+    username: ${DB_USERNAME:dev}
+    password: ${DB_PASSWORD:dev1234}
     driver-class-name: com.mysql.cj.jdbc.Driver
-
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: ${JPA_DDL_AUTO:update}
     properties:
       hibernate:
         format_sql: true
         default_batch_fetch_size: 100
     open-in-view: false
-
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
       repositories:
         enabled: false
 
 server:
-  port: 8081
+  port: ${SERVER_PORT:8081}
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+# 로컬 개발 전용 기본값. 운영에서는 JWT_SECRET 환경변수 필수(application-prod.yml 참조)
 jwt:
-  secret: Y29udGVudC1yYW5raW5nLXN5c3RlbS1sb2NhbC1kZXYtc2VjcmV0LWtleS0yMDI2
-  expiration-millis: 3600000
+  secret: ${JWT_SECRET:Y29udGVudC1yYW5raW5nLXN5c3RlbS1sb2NhbC1kZXYtc2VjcmV0LWtleS0yMDI2}
+  expiration-millis: ${JWT_EXPIRATION_MILLIS:3600000}
 
 viewcount:
-  sync-interval-ms: 60000
+  sync-interval-ms: ${VIEWCOUNT_SYNC_INTERVAL_MS:60000}
 
 logging:
   level:

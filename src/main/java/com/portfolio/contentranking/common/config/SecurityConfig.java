@@ -43,6 +43,7 @@ public class SecurityConfig {
                         ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/error").permitAll()
+                        .requestMatchers("/actuator/health", "/actuator/info").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/contents/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/rankings/**").permitAll()

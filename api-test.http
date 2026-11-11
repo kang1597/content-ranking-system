@@ -295,3 +295,13 @@ Authorization: Bearer {{token1}}
 
 ### 43. 랭킹 재구축 - 토큰 없이 (401 기대)
 POST http://localhost:8081/api/rankings/rebuild
+
+###############################################
+# Actuator
+###############################################
+
+### 44. 빌드 정보
+GET http://localhost:8081/actuator/info
+
+### 45. 헬스체크
+GET http://localhost:8081/actuator/health

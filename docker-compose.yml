@@ -3,10 +3,10 @@ services:
     image: mysql:8.0
     container_name: ranking-mysql
     environment:
-      MYSQL_DATABASE: rankingdb
-      MYSQL_USER: dev
-      MYSQL_PASSWORD: dev1234
-      MYSQL_ROOT_PASSWORD: root1234
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       TZ: Asia/Seoul
     ports:
       - "3308:3306"
@@ -16,7 +16,7 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot1234"]
+      test: [ "CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$$MYSQL_ROOT_PASSWORD" ]
       interval: 10s
       timeout: 5s
       retries: 10
