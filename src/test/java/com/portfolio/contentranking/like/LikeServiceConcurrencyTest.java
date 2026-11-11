@@ -11,6 +11,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.RedisCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @DisplayName("좋아요 동시성 테스트")
+@ActiveProfiles("test")
 class LikeServiceConcurrencyTest {
 
     private static final int REQUEST_COUNT = 100;
@@ -35,6 +39,7 @@ class LikeServiceConcurrencyTest {
     @Autowired private ContentRepository contentRepository;
     @Autowired private ContentLikeRepository contentLikeRepository;
     @Autowired private PasswordEncoder passwordEncoder;
+    @Autowired private StringRedisTemplate redisTemplate;
 
     private Content content;
     private List<Member> members;
@@ -69,6 +74,12 @@ class LikeServiceConcurrencyTest {
         contentLikeRepository.deleteAllInBatch();
         contentRepository.deleteAllInBatch();
         memberRepository.deleteAllInBatch();
+
+        // 테스트 전용 Redis DB(1번)만 비운다
+        redisTemplate.execute((RedisCallback<Object>) connection -> {
+            connection.serverCommands().flushDb();
+            return null;
+        });
     }
 
     @Test

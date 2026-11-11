@@ -12,6 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -27,6 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @DisplayName("좋아요 동시성 전략 비교")
+@ActiveProfiles("test")
 class LikeStrategyComparisonTest {
 
     private static final int REQUEST_COUNT = 100;
@@ -38,6 +42,7 @@ class LikeStrategyComparisonTest {
     @Autowired private ContentLikeRepository contentLikeRepository;
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private LikeCountCache likeCountCache;
+    @Autowired private StringRedisTemplate redisTemplate;
 
     private Long authorId;
     private List<Long> memberIds;
@@ -78,6 +83,12 @@ class LikeStrategyComparisonTest {
         contentLikeRepository.deleteAllInBatch();
         contentRepository.deleteAllInBatch();
         memberRepository.deleteAllInBatch();
+
+        // 테스트 전용 Redis DB(1번)만 비운다
+        redisTemplate.execute((RedisCallback<Object>) connection -> {
+            connection.serverCommands().flushDb();
+            return null;
+        });
     }
 
     @Test
