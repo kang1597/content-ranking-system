@@ -41,8 +41,18 @@ dependencies {
 }
 
 tasks.named('test') {
-    useJUnitPlatform()
-    testLogging {
-        showStandardStreams = true
+    useJUnitPlatform {
+        excludeTags 'measurement'
+    }
+}
+
+// 측정 전용 태스크: ./gradlew measurementTest
+tasks.register('measurementTest', Test) {
+    group = 'verification'
+    description = '동시성 제어 전략 성능 비교 (수동 실행용)'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform {
+        includeTags 'measurement'
     }
 }

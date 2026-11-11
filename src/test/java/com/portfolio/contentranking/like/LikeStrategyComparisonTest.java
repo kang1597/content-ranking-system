@@ -5,10 +5,7 @@ import com.portfolio.contentranking.content.ContentRepository;
 import com.portfolio.contentranking.like.strategy.LikeStrategy;
 import com.portfolio.contentranking.member.Member;
 import com.portfolio.contentranking.member.MemberRepository;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,6 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @DisplayName("좋아요 동시성 전략 비교")
 @ActiveProfiles("test")
+@Tag("measurement")
 class LikeStrategyComparisonTest {
 
     private static final int REQUEST_COUNT = 100;
