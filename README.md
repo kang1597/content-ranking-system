@@ -757,3 +757,8 @@ com.portfolio.contentranking
 좋아요와 조회수는 둘 다 카운터지만 전혀 다르게 구현했고, 랭킹과 캐시는 둘 다 Redis지만 무효화 전략이 다릅니다.
 
 **같은 도구를 쓴다고 같은 방식일 이유는 없습니다.** 먼저 정할 것은 **"이 데이터는 얼마나 정확해야 하는가", "얼마나 잃어도 되는가"** 입니다.
+
+## 함께 보기
+
+- [db-metadata-generator](https://github.com/kang1597/db-metadata-generator) — DB 메타데이터로 테이블 정의서·VO 자동 생성
+- [포트폴리오](https://github.com/kang1597/portfolio)
